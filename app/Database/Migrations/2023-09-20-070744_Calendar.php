@@ -27,7 +27,15 @@ class Calendar extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 500,
             ],
-            'owner' => [
+            'calusername' => [
+                'type' => 'VARCHAR',
+                'constraint' => 500,
+            ],
+            'calcreatedby' => [
+                'type' => 'VARCHAR',
+                'constraint' => 500,
+            ],
+            'calpassword' => [
                 'type' => 'VARCHAR',
                 'constraint' => 500,
             ],
@@ -36,6 +44,14 @@ class Calendar extends Migration
                 'constraint' => 5,
                 'unsigned' => true,
             ],
+            'status' => [
+                'type' => 'VARCHAR',
+                'constraint' => 500,
+            ],
+            'role' => [
+                'type' => 'VARCHAR',
+                'constraint' => 500,
+            ], 
         ]);
         $this->forge->addKey('id', true);
         $this->forge->addForeignKey('user_id', 'users', 'id');

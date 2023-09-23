@@ -36,7 +36,7 @@ class User extends Model
 
     // Validation
     protected $validationRules = [
-        'username' => 'required|min_length[3]|max_length[50]',
+        'name' => 'required|min_length[3]|max_length[50]',
         'email' => 'required|valid_email|is_unique[users.email]',
         'password' => 'required|min_length[6]',
         // Add other validation rules as needed
@@ -61,5 +61,10 @@ class User extends Model
     public function get_user_by_email($email)
 {
     return $this->where('email', $email)->first();
+}
+
+public function calendars()
+{
+    return $this->hasMany('App\Models\Calendar', 'user_id');
 }
 }

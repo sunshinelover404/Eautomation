@@ -23,7 +23,9 @@ $routes->get('logout', 'UserController::logout');
 
 
 // Calendar routes
-$routes->get('/getCalendarData', 'CalendarController::getCalendarData');
-$routes->get('/getUserAllCalendars', 'CalendarController::getUserAllCalendars');
-$routes->get('/createevent', 'CalendarController::createEvent');
-$routes->get('/mkcalendar', 'CalendarController::mkCalendar');
+$routes->get('/getCalendarData','CalendarController::getCalendarData');
+$routes->get('/getUserAllCalendars','CalendarController::getUserAllCalendars');
+$routes->get('/createevent','CalendarController::createEvent');
+$routes->get('/mkcalendar','CalendarController::mkCalendar');
+$routes->get('/homecalendar','CalendarController::homeCalendar');
+$routes->get('/retrieveEvents','CalendarController::retrieveEvents');

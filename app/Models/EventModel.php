@@ -4,21 +4,24 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class Calendar extends Model
+class EventModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'calendars';
+    protected $table            = 'events';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [
-        'calname',
-        'caldescription',
-        'caldavlink',
-        'owner',
-        'createdby'
+    protected $allowedFields = [
+        'calendar_id',
+        'DTSTART',
+        'DTEND',
+        'SUMMARY',
+        'DESCRIPTION',
+        'LOCATION',
+        'createdAt',
+        'updatedAt',
     ];
 
     // Dates
@@ -46,14 +49,8 @@ class Calendar extends Model
     protected $afterDelete    = [];
 
 
-    public function user()
+    public function calendar()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo('App\Models\Calendar', 'calendar_id');
     }
-
-    public function events()
-    {
-        return $this->hasMany('App\Models\EventModel', 'calendar_id');
-    }
-    
 }

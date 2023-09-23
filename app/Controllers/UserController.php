@@ -34,7 +34,7 @@ class UserController extends BaseController
         // return $this->response->setJSON('hello');
         
         $data = [
-            'username' => $this->request->getPost('username'),
+            'name' => $this->request->getPost('name'),
             'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             // Add other user information as needed

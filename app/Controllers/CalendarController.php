@@ -11,10 +11,24 @@ class CalendarController extends BaseController
     public function getCalendarData()
     {
 
+        $calobj = model('Calendar');
+        $AllCalData = $calobj->findAll();
+        foreach ($AllCalData as $CalData) {
+            $this->getCalData($CalData);
+
+        }
+    }
+
+
+
+    public function getCalData($caldata)
+    {
 
         $client = new Client();
-        $username = 'adnan';
-        $password = 'admin123';
+        $uname = $caldata['calcreatedby'];
+        $pass = $caldata['calpassword'];
+        $username = $uname;
+        $password = $pass;
 
         // Create a base64-encoded Basic Authentication string
         $authHeader = 'Basic ' . base64_encode("$username:$password");
@@ -27,7 +41,8 @@ class CalendarController extends BaseController
         ];
 
         // Define the URL
-        $url = 'http://3.85.127.199/dav.php/calendars/adnan/default';
+        $uriLink = $caldata['caldavlink'];
+        $url = $uriLink;
 
         // Create the request
         $request = new Request('PROPFIND', $url, $headers);
@@ -35,38 +50,11 @@ class CalendarController extends BaseController
         try {
             // Send the request and get the response
             $response = $client->send($request);
+
             $responseBody = (string) $response->getBody();
-            $xml = simplexml_load_string($responseBody);
 
-            // Extract 'displayname' and 'calendar-description'
-            $displayname = (string) $xml->xpath('//d:displayname')[0];
-            $calendarDescription = (string) $xml->xpath('//cal:calendar-description')[0];
-            $href = (string) $xml->xpath('//d:href')[0];
-            $timezone = (string) $xml->xpath('//cal:calendar-timezone')[0];
-            $eventDetails = [];
+            $this->getAndSaveEventDetail($responseBody);
 
-            foreach ($xml->xpath('//d:response') as $responseElement) {
-                $href = (string) $responseElement->xpath('d:href')[0];
-                $lastModifiedElement = $responseElement->xpath('d:propstat/d:prop/d:getlastmodified');
-                $etagElement = $responseElement->xpath('d:propstat/d:prop/d:getetag');
-
-                $lastModified = $lastModifiedElement ? (string) $lastModifiedElement[0] : 'N/A';
-                $etag = $etagElement ? (string) $etagElement[0] : 'N/A';
-
-                $eventDetails[] = [
-                    'eventLink' => $href,
-                    'lastModified' => $lastModified,
-                    'etag' => $etag,
-                ];
-            }
-
-            // Output the event details
-            foreach ($eventDetails as $event) {
-                echo "Event Link: {$event['eventLink']}<br>";
-                echo "Last Modified: {$event['lastModified']}<br>";
-                echo "ETag: {$event['etag']}<br>";
-                echo "<br>";
-            }
 
         } catch (Exception $e) {
             // Handle any exceptions here
@@ -76,13 +64,56 @@ class CalendarController extends BaseController
     }
 
 
+    public function getAndSaveEventDetail($responseBody)
+    {
+        $xml = simplexml_load_string($responseBody);
+        // Initialize an array to store the event details
+        foreach ($xml->xpath('//d:response') as $responseNode) {
+            $href = (string) $responseNode->xpath('d:href')[0];
+
+            // Check if there are any matching <d:getetag> elements
+            $etagElements = $responseNode->xpath('d:propstat/d:prop/d:getetag');
+
+            // Initialize a n array to store etag values
+            $etags = [];
+
+            // Iterate through etag elements and add them to the etags array
+            foreach ($etagElements as $etagElement) {
+                $etags[] = (string) $etagElement;
+            }
+
+            // Create an object with the retrieved data
+            $event = (object) [
+                'href' => $href,
+                'etags' => $etags,
+            ];
+
+            // Add the object to the eventDetails array
+            $eventDetails[] = $event;
+        }
+
+
+        // Output the event details
+        foreach ($eventDetails as $event) {
+        $this->retrievingSavingSingleEvent($event);
+           
+
+        }
+ 
+        // Save or process the event details as needed
+        // For example, you can save them to a database, perform calculations, or output them
+        // Here, we'll simply output the event details using dd()
+
+
+    }
 
 
 
 
 
-
-
+    public function retrievingSavingSingleEvent($event){
+       
+    }
 
 
 
@@ -173,7 +204,7 @@ class CalendarController extends BaseController
         $client = new Client();
 
         // Define your username and password
-        $username = 'lisa';
+        $username = 'Lisa';
         $password = 'admin123';
 
         // Create a base64-encoded Basic Authentication string
@@ -181,26 +212,26 @@ class CalendarController extends BaseController
 
         // Define request headers, including Authorization for Basic Auth
         $headers = [
-            'Content-Type' => 'text/plain',
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            // Set the Content-Type header
             'Cookie' => 'PHPSESSID=v8vdteqron2ltu8oqino1ba7q8',
             'Authorization' => $authHeader,
-            // Add the Authorization header
         ];
 
         // Define the request body (your iCalendar data)
-        $body = 'BEGIN:VCALENDAR
-        VERSION:2.0
-        BEGIN:VEVENT
-        DTSTART:20230917T100000
-        DTEND:20230917T120000
-        SUMMARY:LisaTestEvent
-        DESCRIPTION:This is a sample event created via CalDAV.
-        LOCATION:Meeting Room 123
-        END:VEVENT
-        END:VCALENDAR';
+        $body = "BEGIN:VCALENDAR\r\n" .
+            "VERSION:2.0\r\n" .
+            "BEGIN:VEVENT\r\n" .
+            "DTSTART:20230917T100000\r\n" .
+            "DTEND:20230917T120000\r\n" .
+            "SUMMARY:LisaTestEvent\r\n" .
+            "DESCRIPTION:This is a sample event created via CalDAV.\r\n" .
+            "LOCATION:Meeting Room 123\r\n" .
+            "END:VEVENT\r\n" .
+            "END:VCALENDAR\r\n";
 
         // Define the URL for the PUT request
-        $url = 'http://3.85.127.199/dav.php/calendars/lisa/default/LisaTestEvent.ics';
+        $url = 'https://baikal.pindot.me/dav.php/calendars/Lisa/default/LisaTestEvent.ics';
 
         // Create the PUT request
         $request = new Request('PUT', $url, $headers, $body);
@@ -220,7 +251,8 @@ class CalendarController extends BaseController
 
 
 
-    public function mkCalendar() {
+    public function mkCalendar()
+    {
         // Initialize the Guzzle client
         $client = new Client();
 
@@ -235,7 +267,8 @@ class CalendarController extends BaseController
         $headers = [
             'Content-Type' => 'application/xml',
             'Cookie' => 'PHPSESSID=v8vdteqron2ltu8oqino1ba7q8',
-            'Authorization' => $authHeader, // Add the Authorization header
+            'Authorization' => $authHeader,
+            // Add the Authorization header
         ];
 
         // Define the XML body for the MKCALENDAR request
@@ -292,6 +325,73 @@ class CalendarController extends BaseController
         } catch (Exception $e) {
             // Handle any exceptions here
             echo 'Error: ' . $e->getMessage();
+        }
+    }
+
+
+
+    public function homeCalendar()
+    {
+        return view('/Calendar/HomeCalendar');
+    }
+
+
+
+
+
+
+
+    public function retrieveEvents()
+    {
+        $user_id = 1;
+
+        // Load User_model, Calendar_model, and Event_model
+        $userModel = model('User');
+        $calendarModel = model(App\Models\Calendar::class);
+        $EventModel = model(App\Models\EventModel::class);
+
+        // Retrieve the user with their associated calendars and events
+        $user = $userModel->find($user_id);
+
+        // Check if the user exists
+        if ($user) {
+            // Load the related calendars using a separate query
+            $calendarModel = new \App\Models\Calendar();
+            $calendars = $calendarModel->where('user_id', $user_id)->findAll();
+            $cal_ids = [];
+            foreach ($calendars as $calendar) {
+                array_push($cal_ids, $calendar['id']);
+
+            }
+
+            $cal_events = [];
+            if ($cal_ids) {
+                $EventModel = new \App\Models\EventModel();
+
+                foreach ($cal_ids as $cal_id) {
+                    $events = $EventModel->where('calendar_id', $cal_id)->findAll();
+
+                    foreach ($events as $event) {
+                        $cal_events[] = (object) [
+                            'title' => $event['SUMMARY'],
+                            'description' => $event['SUMMARY'],
+                            'start' => date('Y-m-d\TH:i:s', strtotime($event['DTSTART'])),
+                            'end' => date('Y-m-d\TH:i:s', strtotime($event['DTEND'])),
+                            'allDay' => false
+                        ];
+                    }
+                }
+                // dd($cal_events);
+                return view('/Calendar/HomeCalendar', ['eventdata' => $cal_events]);
+            } else {
+                // Handle the case where $cal_ids is empty or no events are found.
+            }
+
+            // Now, $user contains the user data, and $calendars contains their calendars.
+
+            // You can access user properties like $user->name and calendars like $calendars[0]->title.
+        } else {
+            // Handle the case where the user is not found.
         }
     }
 
