@@ -66,6 +66,9 @@
         </div>
     </nav>
 
+
+  
+
     <section class="dashboard">
         <div class="top">
             <i class="uil uil-bars sidebar-toggle"></i>
@@ -118,7 +121,18 @@
                     <span class="text">Calendar Data</span>
              </div>
             </div> -->
+            <?php if (session()->has('success')) : ?>
+    <div class="alert alert-success">
+        <?= session('success') ?>
+    </div>
+<?php endif; ?>
 
+<!-- Check for error message -->
+<?php if (session()->has('error')) : ?>
+    <div class="alert alert-danger">
+        <?= session('error') ?>
+    </div>
+<?php endif; ?>
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>

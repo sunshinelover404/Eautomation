@@ -156,6 +156,15 @@ public function dashboard()
         }
     }
 
+    public function fetchExistingUsers(){
+        $userModel=model('User');
+        $users = $userModel->findAll();
+dd($users);
+    // Return the users as JSON response
+    return $this->response->setJSON(['users' => $users]);
+
+    }
+
 
     public function logout()
 {

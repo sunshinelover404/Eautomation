@@ -66,6 +66,10 @@
         </div>
     </nav>
 
+
+
+    
+
     <section class="dashboard">
         <div class="top">
             <i class="uil uil-bars sidebar-toggle"></i>
@@ -167,46 +171,76 @@
 
             <!-- model for creating Therapist Calendar -->
             <div class="modal fade" id="createCalModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Create Calendar</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form action="/mkCalendar" method="post">
-                                <div class="form-group">
-                                    <label for="calTitle">Calendar Title:</label>
-                                    <input type="text" class="form-control" id="calTitle" name="calTitle">
-                                </div>
-                                <div class="form-group">
-                                    <label for="calDescription">Calendar Description:</label>
-                                    <textarea class="form-control" id="calDescription" name="calDescription"
-                                        rows="3"></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Choose Calendar Type:</label>
-                                    <div class="custom-control custom-radio">
-                                        <input class="custom-control-input" type="checkbox" role="switch"
-                                            name="calendarType1" id="bookingRadio" value="Booking" checked>
-                                        <label class="custom-control-label" for="bookingRadio">Booking Calendar</label>
-                                    </div>
-                                    <div class="custom-control custom-radio">
-                                        <input class="custom-control-input" type="checkbox" role="switch"
-                                            name="calendarType2" id="availableRadio" value="Available" checked>
-                                        <label class="custom-control-label" for="availableRadio">Available
-                                            Calendar</label>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </form>
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create Calendar</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/mkCalendar" method="post">
+                    <div class="form-group">
+                        <label for="calTitle">Calendar Title:</label>
+                        <input type="text" class="form-control" id="calTitle" name="calTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="calDescription">Calendar Description:</label>
+                        <textarea class="form-control" id="calDescription" name="calDescription"
+                            rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="userSelection">User Selection:</label>
+                        <select class="form-control" id="userSelection" name="userSelection">
+                            <option value="existing">Existing User</option>
+                            <option value="new">New User</option>
+                        </select>
+                    </div>
+
+                    <div id="existingUserSection" style="display: none;">
+                        <div class="form-group">
+                            <label for="existingUser">Select Existing User:</label>
+                            <select class="form-control" id="existingUser" name="existingUser">
+                                <!-- Options for existing users will be added dynamically via AJAX -->
+                            </select>
                         </div>
                     </div>
-                </div>
+
+                    <div id="newUserSection" style="display: none;">
+                        <div class="form-group">
+                            <label for="newUserName">New User Name:</label>
+                            <input type="text" class="form-control" id="newUserName" name="newUserName">
+                        </div>
+                        <!-- Add any other fields for new user details as needed -->
+                    </div>
+
+                    <div class="form-group">
+                        <label>Choose Calendar Type:</label>
+                        <div class="custom-control custom-radio">
+                            <input class="custom-control-input" type="checkbox" role="switch" name="calendarType1"
+                                id="bookingRadio" value="Booking" checked>
+                            <label class="custom-control-label" for="bookingRadio">Booking Calendar</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input class="custom-control-input" type="checkbox" role="switch" name="calendarType2"
+                                id="availableRadio" value="Available" checked>
+                            <label class="custom-control-label" for="availableRadio">Available Calendar</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add the JavaScript/jQuery code here
+    // ...
+</script>
+
 
 
             <!-- model for creating Therapist Calendar Ended-->
@@ -838,6 +872,54 @@
 
             // Open the modal
             $("#createCalModal").modal("show");
+        });
+    });
+</script>
+
+<script>
+    // Function to show/hide sections based on user selection
+    function toggleUserSections() {
+        var userSelection = $("#userSelection").val();
+        if (userSelection === "existing") {
+            $("#existingUserSection").show();
+            $("#newUserSection").hide();
+        } else {
+            $("#existingUserSection").hide();
+            $("#newUserSection").show();
+        }
+    }
+
+    // Listen for user selection changes
+    $("#userSelection").change(function () {
+        toggleUserSections();
+    });
+
+    // Initially hide the new user section
+    toggleUserSections();
+
+    // Fetch existing users via AJAX when the page loads
+    $(document).ready(function () {
+        // Make an AJAX request to fetch existing users and populate the select
+        $.ajax({
+            url: "/fetchExistingUsers", // Replace with the actual URL
+            method: "GET",
+            dataType: "json",
+            success: function (data) {
+                // Populate the select with existing user options
+                var existingUserSelect = $("#existingUser");
+                existingUserSelect.empty(); // Clear existing options
+                for (var i = 0; i < data.length; i++) {
+                    existingUserSelect.append(
+                        $("<option>", {
+                            value: data[i].id,
+                            text: data[i].name, // Replace with the actual user data
+                        })
+                    );
+                }
+            },
+            error: function (error) {
+                console.error("Error fetching existing users: " + error);
+            },
         });
     });
 </script>

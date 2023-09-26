@@ -13,7 +13,9 @@ $routes->post('/register', 'UserController::do_register');
 $routes->get('/therapist/login', 'UserController::login');
 $routes->post('/login', 'UserController::do_login');
 $routes->get('/dashboard', 'UserController::dashboard'); //['filter' => 'auth']
+$routes->get('/fetchExistingUsers', 'UserController::fetchExistingUsers');
 $routes->get('logout', 'UserController::logout');
+
 
 // User Authentication Exit  
 

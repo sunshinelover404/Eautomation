@@ -173,33 +173,41 @@ class CalendarController extends BaseController
 
             $EventModel = model('EventModel');
 
+
+
             if ($uid !== null) {
                 // Check if an event with the same UID exists in the events table for the given calendar
                 $existingEvent = $EventModel
                     ->where('event_uid', $uid)
                     ->where('calendar_id', $CalData['id'])
                     ->first();
-
+            
                 if ($existingEvent) {
-                    // Update the existing event with new data
-                    $existingEvent = model('EventModel');
-                    $existingEvent->SUMMARY = $summary;
-                    $existingEvent->DESCRIPTION = $description;
-                    $existingEvent->DTSTART = $dtstart;
-                    $existingEvent->DTEND = $dtstart; // Set DTEND as DTSTART (modify as needed)
-                    $existingEvent->LOCATION = '';
-                    $existingEvent->calendar_id = $CalData['id'];
-
-                    // Save the updated event
-                    $EventModel->update($existingEvent->id, $existingEvent);
+                    // Create an instance of the EventModel for the existing event
+                    $existingEventModel = model('EventModel');
+                    
+                    // Check if the record exists in the database
+                    $existingRecord = $existingEventModel->find($existingEvent['id']);
+            
+                    if ($existingRecord !== null) {
+                        // Update the existing event with new data
+                        $existingRecord['SUMMARY'] = $summary;
+                        $existingRecord['DESCRIPTION'] = $description;
+                        $existingRecord['DTSTART'] = $dtstart;
+                        $existingRecord['DTEND'] = $dtstart; // Set DTEND as DTSTART (modify as needed)
+                        $existingRecord['LOCATION'] = '';
+                        $existingRecord['calendar_id'] = $CalData['id'];
+                
+                        // Save the updated event
+                        $existingEventModel->update($existingRecord['id'], $existingRecord);
+                    }
                 } else {
                     // Create a new event and set its properties
                     $newEvent = [
                         'SUMMARY' => $summary,
                         'DESCRIPTION' => $description,
                         'DTSTART' => $dtstart,
-                        'DTEND' => $dtstart,
-                        // Set DTEND as DTSTART (modify as needed)
+                        'DTEND' => $dtstart, // Set DTEND as DTSTART (modify as needed)
                         'LOCATION' => '',
                         'calendar_id' => $CalData['id'],
                         'event_uid' => $uid,
@@ -207,21 +215,21 @@ class CalendarController extends BaseController
                     ];
                     // Save the new event
                     $EventModel->insert($newEvent);
-                    
                 }
-                echo "Event updated/created successfully.";
             } else {
                 // Handle the case where 'UID' is not found in the event data
                 echo "UID not found in event data.";
             }
 
             echo $responseData; // Example: Display the response
-        } catch (\GuzzleHttp\Exception\RequestException $e) {
+        }
+         catch (\GuzzleHttp\Exception\RequestException $e) {
             // Handle request exceptions here
-            echo 'Error: ' . $e->getMessage();
+            // echo 'Error: ' . $e->getMessage();
+            echo("something went wrong while fetching data");
         }
 
-    }
+        }
 
 
 
@@ -313,82 +321,203 @@ class CalendarController extends BaseController
 
 
 
-    public function createEvent()
-    {
+    // public function createEvent()
+    // {
 
-        $userId =  $this->request->getPost('userid');
-       
-        $eventTitle =  $this->request->getPost('eventTitle');
-        $fromDate =  $this->request->getPost('fromDate');
-        $fromTime =  $this->request->getPost('fromTime');
-        $toDate =  $this->request->getPost('toDate');
-        $toTime =  $this->request->getPost('toTime');
-        $eventDescription = $this->request->getPost('eventDescription');
+    //     $userId =  $this->request->getPost('userid');
+    //     $eventTitle =  $this->request->getPost('eventTitle');
+    //     $fromDate =  $this->request->getPost('fromDate');
+    //     $fromTime =  $this->request->getPost('fromTime');
+    //     $toDate =  $this->request->getPost('toDate');
+    //     $toTime =  $this->request->getPost('toTime');
+    //     $eventDescription = $this->request->getPost('eventDescription');
         
-        $calendarModel =model('Calendar'); 
-        $eventModel =model('EventModel'); 
+    //     $calendarModel =model('Calendar'); 
+    //     $eventModel =model('EventModel'); 
 
-        $calendar = $calendarModel
+    //     $calendar = $calendarModel
+    //     ->where('user_id', $userId)
+    //     ->where('role', 'booking')
+    //     ->where('status', 'active')
+    //     ->first();
+
+    //     $calLink=$calendar['caldavlink'];
+    //     $calcreatedby=$calendar['calcreatedby'];
+    //     $calpassword=$calendar['calpassword'];
+    //     $fromDateTime = date('Ymd\THis', strtotime("$fromDate $fromTime"));
+    //     $toDateTime = date('Ymd\THis', strtotime("$toDate $toTime"));
+        
+    //     $client = new Client();
+    //     // Define your username and password
+    //     $username =  $calcreatedby;
+    //     $password =  $calpassword;
+
+    //     // Create a base64-encoded Basic Authentication string
+    //     $authHeader = 'Basic ' . base64_encode("$username:$password");
+
+    //     // Define request headers, including Authorization for Basic Auth
+    //     $headers = [
+    //         'Content-Type' => 'text/calendar; charset=utf-8',
+    //         // Set the Content-Type header
+    //         'Cookie' => 'PHPSESSID=v8vdteqron2ltu8oqino1ba7q8',
+    //         'Authorization' => $authHeader,
+    //     ];
+
+    //     // Define the request body (your iCalendar data)
+    //     $body = "BEGIN:VCALENDAR\r\n" .
+    //     "VERSION:2.0\r\n" .
+    //     "BEGIN:VEVENT\r\n" .
+    //     "DTSTART:$fromDateTime\r\n" . // Use formatted date and time
+    //     "DTEND:$toDateTime\r\n" .     // Use formatted date and time
+    //     "SUMMARY:$eventTitle\r\n" .   // Use retrieved event title
+    //     "DESCRIPTION:$eventDescription\r\n" . // Use retrieved event description
+    //     "LOCATION:Meeting Room 123\r\n" .
+    //     "END:VEVENT\r\n" .
+    //     "END:VCALENDAR\r\n";
+    //     // Define the URL for the PUT request
+    //     $url = $calLink. $eventTitle.'.ics';
+       
+
+    //     // Create the PUT request
+    //     $request = new Request('PUT', $url, $headers, $body);
+
+    //     try {
+    //         // Send the PUT request and wait for the response
+    //         $response = $client->send($request);
+
+    //         // Get and display the response body
+    //         $responseBody = (string) $response->getBody();
+    //         if ($responseBody == "") {
+    //             $message = 'Booking Created Successfully';
+    //             return redirect()->to('/')->with('success', $message);
+    //         } else {
+    //             $errorMessage = 'Error creating the booking.';
+    //             return redirect()->to('/')->with('error', $errorMessage);
+    //         }
+    //     } catch (Exception $e) {
+    //         // Handle any exceptions here
+    //         echo 'Error: ' . $e->getMessage();
+    //     }
+    // }
+
+    public function createEvent()
+{
+    $userId = $this->request->getPost('userid');
+    $eventTitle = $this->request->getPost('eventTitle');
+    $fromDate = $this->request->getPost('fromDate');
+    $fromTime = $this->request->getPost('fromTime');
+    $toDate = $this->request->getPost('toDate');
+    $toTime = $this->request->getPost('toTime');
+    $eventDescription = $this->request->getPost('eventDescription');
+    
+    $calendarModel = model('Calendar'); 
+    $eventModel = model('EventModel'); 
+
+    $calendar = $calendarModel
         ->where('user_id', $userId)
-        ->where('role', 'booking')
+        ->where('role', 'availability')
         ->where('status', 'active')
         ->first();
 
-        $calLink=$calendar['caldavlink'];
-        $calcreatedby=$calendar['calcreatedby'];
-        $calpassword=$calendar['calpassword'];
-        $fromDateTime = date('Ymd\THis', strtotime("$fromDate $fromTime"));
-        $toDateTime = date('Ymd\THis', strtotime("$toDate $toTime"));
-        
-        $client = new Client();
-        // Define your username and password
-        $username =  $calcreatedby;
-        $password =  $calpassword;
+    $calLink = $calendar['caldavlink'];
+    $calcreatedby = $calendar['calcreatedby'];
+    $calpassword = $calendar['calpassword'];
+    $fromTimestamp = strtotime("$fromDate $fromTime");
+    $toTimestamp = strtotime("$toDate $toTime");
 
-        // Create a base64-encoded Basic Authentication string
-        $authHeader = 'Basic ' . base64_encode("$username:$password");
+    $client = new Client();
+    $username = $calcreatedby;
+    $password = $calpassword;
+    $authHeader = 'Basic ' . base64_encode("$username:$password");
 
-        // Define request headers, including Authorization for Basic Auth
-        $headers = [
-            'Content-Type' => 'text/calendar; charset=utf-8',
-            // Set the Content-Type header
-            'Cookie' => 'PHPSESSID=v8vdteqron2ltu8oqino1ba7q8',
-            'Authorization' => $authHeader,
-        ];
+    $headers = [
+        'Content-Type' => 'text/calendar; charset=utf-8',
+        'Cookie' => 'PHPSESSID=v8vdteqron2ltu8oqino1ba7q8',
+        'Authorization' => $authHeader,
+    ];
 
-        // Define the request body (your iCalendar data)
-        $body = "BEGIN:VCALENDAR\r\n" .
-        "VERSION:2.0\r\n" .
-        "BEGIN:VEVENT\r\n" .
-        "DTSTART:$fromDateTime\r\n" . // Use formatted date and time
-        "DTEND:$toDateTime\r\n" .     // Use formatted date and time
-        "SUMMARY:$eventTitle\r\n" .   // Use retrieved event title
-        "DESCRIPTION:$eventDescription\r\n" . // Use retrieved event description
-        "LOCATION:Meeting Room 123\r\n" .
-        "END:VEVENT\r\n" .
-        "END:VCALENDAR\r\n";
-        // Define the URL for the PUT request
-        $url = $calLink. $eventTitle.'.ics';
-       
+    $body = "BEGIN:VCALENDAR\r\n" .
+    "VERSION:2.0\r\n" .
+    "BEGIN:VEVENT\r\n" .
+    "DTSTART:" . date('Ymd\THis', $fromTimestamp) . "\r\n" .
+    "DTEND:" . date('Ymd\THis', $toTimestamp) . "\r\n" .
+    "SUMMARY:$eventTitle\r\n" .
+    "DESCRIPTION:$eventDescription\r\n" .
+    "LOCATION:Meeting Room 123\r\n" .
+    "END:VEVENT\r\n" .
+    "END:VCALENDAR\r\n";
 
-        // Create the PUT request
+    $url = $calLink . $eventTitle . '.ics';
+
+    // Check if the time slot is available
+    $isSlotAvailable = $this->isTimeSlotAvailable($calendar['id'], $fromTimestamp, $toTimestamp);
+
+    
+    if ($isSlotAvailable) {
+        // The time slot is available, proceed to create the event
+
         $request = new Request('PUT', $url, $headers, $body);
 
         try {
-            // Send the PUT request and wait for the response
             $response = $client->send($request);
 
-            // Get and display the response body
             $responseBody = (string) $response->getBody();
-            if($responseBody==""){
-                $message='Booking Created Successfully';
-                return redirect()->to('/');
+            if ($responseBody == "") {
+                $message = 'Booking Created Successfully';
+                return redirect()->to('/')->with('success', $message);
+            } else {
+                $errorMessage = 'Error creating the booking Choose other time stamp.';
+                return redirect()->to('/')->with('error', $errorMessage);
             }
         } catch (Exception $e) {
             // Handle any exceptions here
             echo 'Error: ' . $e->getMessage();
+    }
+    } else {
+        // The time slot is not available, show an error message
+        $errorMessage = 'The selected time slot is not available.';
+        return redirect()->to('/')->with('error', $errorMessage);
+    }
+}
+
+
+
+
+
+
+
+private function isTimeSlotAvailable($calendarId, $fromTimestamp, $toTimestamp)
+{
+    $eventModel = model('EventModel');
+    
+    // Get the current timestamp
+    $currentTimestamp = time();
+
+    // Check if there are any events in the same calendar that overlap with the provided time slot
+    $overlappingEvents = $eventModel
+        ->where('calendar_id', $calendarId)
+        ->findAll();
+
+    foreach ($overlappingEvents as $event) {
+        $eventStartTimestamp = strtotime($event['DTSTART']);
+        $eventEndTimestamp = strtotime($event['DTEND']);
+
+        // Check if the event is in the future (DTSTART and DTEND are in the future)
+        if ($eventStartTimestamp >= $currentTimestamp && $eventEndTimestamp >= $currentTimestamp) {
+            // Check if the provided time slot overlaps with this event
+            if ($fromTimestamp < $eventEndTimestamp && $toTimestamp > $eventStartTimestamp) {
+                // The selected time slot overlaps with this event
+                return false; // Not available
+            }
         }
     }
+
+    // The time slot is available if no overlapping event is found
+    return true;
+}
+
+
+
 
 
 
@@ -402,11 +531,8 @@ class CalendarController extends BaseController
         $user_id = (int) session('user_id');
       
         $user_name = session('name');
-
-
         // Initialize the Guzzle client
         $client = new Client();
-
         $calTitle = $this->request->getPost('calTitle');
         $calDescription = $this->request->getPost('calDescription');
         $calendarType1 = $this->request->getPost('calendarType1');
@@ -414,10 +540,9 @@ class CalendarController extends BaseController
 
 
 
-
         // Define your username and password
         $username = 'Lisa';
-        $password = 'admin123';
+        $password = 'lisatest';
 
         // Create a base64-encoded Basic Authentication string
         $authHeader = 'Basic ' . base64_encode("$username:$password");
@@ -425,13 +550,11 @@ class CalendarController extends BaseController
         // Define request headers, including Authorization for Basic Auth
         $headers = [
             'Content-Type' => 'application/xml',
-            'Cookie' => 'PHPSESSID=k7p58dm0nrlsei2jm2k1gec4ho',
             'Authorization' => $authHeader,
             // Add the Authorization header
         ];
  
 
-          
         $randomString = $this->generateRandomString(10);
         $prefix=$user_name;
         $randomString =$prefix.$randomString;
@@ -513,10 +636,10 @@ class CalendarController extends BaseController
                 echo 'Error: ' . $e->getMessage();
             }
 
-            $randomString = $this->generateRandomString(10);
+            $randomString2 = $this->generateRandomString(10);
             $prefix=$user_name;
-            $randomString =$prefix.$randomString;
-            $request = new Request('MKCALENDAR', 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString, $headers, $body);
+            $randomString2 =$prefix.$randomString2;
+            $request = new Request('MKCALENDAR', 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString2, $headers, $body);
 
             try {
                 // Send the MKCALENDAR request and wait for the response
@@ -525,7 +648,7 @@ class CalendarController extends BaseController
                 // Get and display the response body
                 $responseBody = (string) $response->getBody();
                 if ($responseBody == "") {
-                    $uri = 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString .'/';
+                    $uri = 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString2 .'/';
                     $user_id = (int) session('user_id');
       
                     $user_name = session('name');
@@ -552,95 +675,12 @@ class CalendarController extends BaseController
                 echo 'Error: ' . $e->getMessage();
             }
 
-        } elseif ($calendarType1) {
-
-            $randomString = $this->generateRandomString(10);
-            $prefix=$user_name;
-            $randomString =$prefix.$randomString;
-            $request = new Request('MKCALENDAR', 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString, $headers, $body);
-
-            try {
-                // Send the MKCALENDAR request and wait for the response
-                $response = $client->sendAsync($request)->wait();
-
-                // Get and display the response body
-               
-                $responseBody = (string) $response->getBody();
-                if ($responseBody == "") {
-                    $user_id = (int) session('user_id');
-      
-                    $user_name = session('name');
-                    $uri = 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString .'/';
-                    $newEvent = [
-                        'calname' => $randomString,
-                        'caldescription' => $calDescription,
-                        'caldavlink' => $uri,
-                        'calusername' => session('user_name'),
-                        // Set DTEND as DTSTART (modify as needed)
-                        'calcreatedby' => $username,
-                        'calpassword' => $password,
-                        'user_id' => $user_id,
-                        'role' => 'booking',
-                        'status' => 'active',
-
-                        // Set UID
-                    ];
-                    // Save the new event
-                    $calendarModel->insert($newEvent);
-                    return redirect()->to('dashboard');
-                    
-                }
-            } catch (Exception $e) {
-                // Handle any exceptions here
-                echo 'Error: ' . $e->getMessage();
-            }
-
-        } elseif ($calendarType2) {
-            $randomString = $this->generateRandomString(10);
-            $prefix=$user_name;
-            $randomString =$prefix.$randomString;
-
-            $request = new Request('MKCALENDAR', 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString, $headers, $body);
-
-            try {
-                // Send the MKCALENDAR request and wait for the response
-                $response = $client->sendAsync($request)->wait();
-
-                // Get and display the response body
-                $responseBody = (string) $response->getBody();
-                $user_id = (int) session('user_id');
-      
-                $user_name = session('name');
-                if ($responseBody == "") {
-                    $uri = 'https://baikal.pindot.me/dav.php/calendars/Lisa/' . $randomString.'/';
-                    $newEvent = [
-                        'calname' => $randomString,
-                        'caldescription' => $calDescription,
-                        'caldavlink' => $uri,
-                        'calusername' => session('user_name'),
-                        // Set DTEND as DTSTART (modify as needed)
-                        'calcreatedby' => $username,
-                        'calpassword' => $password,
-                        'user_id' => $user_id,
-                        'role' =>'available',
-                        'status' =>'active',
-
-                        // Set UID
-                    ];
-                    // Save the new event
-                    $calendarModel->insert($newEvent);
-                    return redirect()->to('dashboard');
-                }
-            } catch (Exception $e) {
-                // Handle any exceptions here
-                echo 'Error: ' . $e->getMessage();
-            }
-
-
-        } else {
-
-
+        }  else {
+            $message = "Server is not responding."; // Replace with your error message
+            $this->session->set_flashdata('error', $message);
         }
+    
+       return redirect()->to('dashboard');
     }
 
 
@@ -681,7 +721,11 @@ class CalendarController extends BaseController
 // display to client to create bookings on it
 
     public function retrieveTherapistAvailibilityEvents($userId)
+    
     {
+
+
+       
         $user_id = $userId;
 
         // Load User_model, Calendar_model, and Event_model
@@ -696,20 +740,24 @@ class CalendarController extends BaseController
         if ($user) {
             // Load the related calendars using a separate query
             $calendarModel = new \App\Models\Calendar();
-            $calendars = $calendarModel->where('user_id', $user_id)->findAll();
+            $calendars = $calendarModel
+            ->where('user_id', $user_id)
+            ->where('role', 'availability')
+            ->findAll();
+
+            
             $cal_ids = [];
             foreach ($calendars as $calendar) {
                 array_push($cal_ids, $calendar['id']);
 
             }
-
+         
             $cal_events = [];
             if ($cal_ids) {
                 $EventModel = new \App\Models\EventModel();
 
                 foreach ($cal_ids as $cal_id) {
                     $events = $EventModel->where('calendar_id', $cal_id)->findAll();
-
                     foreach ($events as $event) {
                         $cal_events[] = (object) [
                             'title' => $event['SUMMARY'],
