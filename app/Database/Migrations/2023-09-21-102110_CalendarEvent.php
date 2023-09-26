@@ -20,6 +20,11 @@ class CalendarEvent extends Migration
                     'constraint' => 5,
                     'unsigned' => true,
                 ],
+                'event_uid' => [
+                    'type' => 'VARCHAR',
+                    'constraint' => 500,
+                    
+                ],
                 'DTSTART' => [
                     'type' => 'VARCHAR',
                     'constraint' => 500,

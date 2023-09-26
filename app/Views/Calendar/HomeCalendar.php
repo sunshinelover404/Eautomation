@@ -30,7 +30,7 @@
 
     <!-- FullCalendar Container -->
     <div id="calendar"></div>
-
+   
     <!-- Event Creation Modal -->
     <div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel"
         aria-hidden="true">
@@ -44,42 +44,46 @@
                 </div>
                 <div class="modal-body">
                     <!-- Form to Enter Event Details -->
-                    <form>
+                    <form method="POST" action="<?= site_url('/createevent') ?>">
                         <div class="mb-3">
+                        <input type="hidden" id="userid" name="userid" value="<?= isset($userId) ? $userId : '' ?>">
+
+
                             <label for="eventTitle" class="form-label">Event Title</label>
-                            <input type="text" class="form-control" id="eventTitle" placeholder="Event Title">
+                            <input type="text" class="form-control"  name="eventTitle" placeholder="Event Title">
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="fromDate" class="form-label">From Date</label>
-                                <input type="date" class="form-control" id="fromDate">
+                                <input type="date" class="form-control" name="fromDate">
                             </div>
                             <div class="col-md-6">
                                 <label for="fromTime" class="form-label">From Time</label>
-                                <input type="time" class="form-control" id="fromTime">
+                                <input type="time" class="form-control" name="fromTime">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="toDate" class="form-label">To Date</label>
-                                <input type="date" class="form-control" id="toDate">
+                                <input type="date" class="form-control" name="toDate">
                             </div>
                             <div class="col-md-6">
                                 <label for="toTime" class="form-label">To Time</label>
-                                <input type="time" class="form-control" id="toTime">
+                                <input type="time" class="form-control" name="toTime">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="eventDescription" class="form-label">Event Description</label>
-                            <textarea class="form-control" id="eventDescription" placeholder="Event Description"
+                            <textarea class="form-control" name="eventDescription" placeholder="Event Description"
                                 rows="4"></textarea>
                         </div>
+                        <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" name="saveEvent">Save Event</button>
+                </div>
                     </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveEvent">Save Event</button>
-                </div>
+               
             </div>
         </div>
     </div>

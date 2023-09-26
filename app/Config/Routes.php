@@ -8,11 +8,11 @@ use CodeIgniter\Router\RouteCollection;
 
  // User Authentication 
 $routes->get('/', 'Home::index');
-$routes->get('/register', 'UserController::register');
+$routes->get('/therapist/register', 'UserController::register');
 $routes->post('/register', 'UserController::do_register');
-$routes->get('/login', 'UserController::login');
+$routes->get('/therapist/login', 'UserController::login');
 $routes->post('/login', 'UserController::do_login');
-$routes->get('/dashboard', 'UserController::dashboard', ['filter' => 'auth']);
+$routes->get('/dashboard', 'UserController::dashboard'); //['filter' => 'auth']
 $routes->get('logout', 'UserController::logout');
 
 // User Authentication Exit  
@@ -25,7 +25,7 @@ $routes->get('logout', 'UserController::logout');
 // Calendar routes
 $routes->get('/getCalendarData','CalendarController::getCalendarData');
 $routes->get('/getUserAllCalendars','CalendarController::getUserAllCalendars');
-$routes->get('/createevent','CalendarController::createEvent');
-$routes->get('/mkcalendar','CalendarController::mkCalendar');
+$routes->post('/createevent','CalendarController::createEvent');
+$routes->post('/mkCalendar','CalendarController::mkCalendar');
 $routes->get('/homecalendar','CalendarController::homeCalendar');
-$routes->get('/retrieveEvents','CalendarController::retrieveEvents');
+$routes->get('/retrieveTherapistAvailibilityEvents/(:num)','CalendarController::retrieveTherapistAvailibilityEvents/$1');

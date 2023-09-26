@@ -14,14 +14,13 @@ class EventModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'calendar_id',
-        'DTSTART',
-        'DTEND',
         'SUMMARY',
         'DESCRIPTION',
+        'DTSTART',
+        'DTEND',
         'LOCATION',
-        'createdAt',
-        'updatedAt',
+        'calendar_id',
+        'event_uid',
     ];
 
     // Dates

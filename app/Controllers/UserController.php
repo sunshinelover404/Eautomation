@@ -10,22 +10,67 @@ class UserController extends BaseController
 
     public function register()
     {
-        $userModel = model('User');
+       // $userModel = model('User');
     
-        return view('register_view');
+        return view('TherapistView/register');
     }
     public function login()
     {
         $userModel = model('User');
     
-        return view('login');
+        return view('TherapistView/login');
     }
-    public function dashboard()
-    {
-        $userModel = model('User');
+
+
+
+
+
+
+
+
+  
+
+
+public function dashboard()
+{
+    $session = session();
+    $userModel = model('User');
+    $calendarModel = model('Calendar');
+    $user_id = session('user_id');
+ 
+    // Retrieve calendar data for the user
+    $calendarData = $calendarModel->where('user_id', $user_id )->findAll();
     
-        return view('dashboard');
+
+
+    // Check if any records were found
+    // Check if any records were foundt
+    $recordCount = count($calendarData);
+ 
+    if (count($calendarData) > 0) {
+        // Records found, set $record to true
+        $record = true;
+    } else {
+        // No records found, set $record to false
+        $record = false;
     }
+
+    // Pass the data to the view
+    return view('TherapistView/dashboard', [
+        'calendarData' => $calendarData,
+        'record' => $record,
+        'recordcount'=> $recordCount
+    ]);
+}
+
+
+
+
+
+
+
+
+
 
     // Function to handle user registration form submission
     public function do_register()
@@ -88,12 +133,14 @@ class UserController extends BaseController
                 $user_data = [
                     'user_id' => $user['id'],
                     'email' => $user['email'],
+                    'name' => $user['name'],
                     'logged_in' => true
                 ];
 
                 $session->set($user_data);
            
                 $user_id = $session->get('user_id');
+              
                 // $email = $session->get('email');
                 // $logged_in = $session->get('logged_in');
                 
@@ -102,10 +149,10 @@ class UserController extends BaseController
 
                 return redirect()->to('dashboard'); // Redirect to the dashboard upon successful login
             } else {
-                return redirect()->to('login')->with('error', 'Invalid credentials');
+                return redirect()->to('/therapist/login')->with('error', 'Invalid credentials');
             }
         } else {
-            return redirect()->to('login')->with('error', 'User not found');
+            return redirect()->to('/therapist/login')->with('error', 'User not found');
         }
     }
 
@@ -114,7 +161,7 @@ class UserController extends BaseController
 {
     $session = session();
     $session->destroy(); // Destroy the user's session data
-    return redirect()->to('login'); // Redirect to the login page after logout
+    return redirect()->to('/therapist/login'); // Redirect to the login page after logout
 }
     
 }

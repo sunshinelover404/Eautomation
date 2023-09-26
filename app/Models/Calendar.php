@@ -17,8 +17,13 @@ class Calendar extends Model
         'calname',
         'caldescription',
         'caldavlink',
-        'owner',
-        'createdby'
+        'calusername',
+        'calcreatedby',
+        'calpassword',
+        'user_id',
+        'status',
+        'role',
+
     ];
 
     // Dates
